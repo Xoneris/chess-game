@@ -3,6 +3,17 @@ import { ChessGame } from "./ChessGame"
 
 export default function App() {
   
+  const baseBoard = [
+        ["bR","bN","bB","bQ","bK","bB","bN","bR",],
+        ["bP","bP","bP","bP","bP","bP","bP","bP",],
+        ["","","","","","","","",],
+        ["","","","","","","","",],
+        ["","","","","","","","",],
+        ["","","","","","","","",],
+        ["wP","wP","wP","wP","wP","wP","wP","wP",],
+        ["wR","wN","wB","wQ","wK","wB","wN","wR",],
+      ]
+
   const chessGame = useRef(new ChessGame())
   const [isPieceSelected, setIsPieceSelected] = useState({value: false})
   const [currentPlayer, setCurrentPlayer] = useState("w")
@@ -94,8 +105,19 @@ export default function App() {
     }
   }
 
+  const newGame = () => {
+    chessGame.current = new ChessGame(baseBoard)
+    setIsPieceSelected({...isPieceSelected, value: false})
+    setCurrentPlayer("w")
+    setPromotion(["",0,0])
+  }
+
   return (
     <main className="w-screen h-screen flex flex-col justify-center items-center bg-gray-400">
+
+      <button className="bg-white p-2 border mb-2 rounded-lg hover:cursor-pointer" onClick={() => newGame()}>
+        New Game
+      </button>
       {
         chessGame.current.board.map((row,rowIndex) => (
           <div className="flex" key={rowIndex} >
