@@ -1,17 +1,18 @@
 // ToDo:
-// - Pawn: Promotion, En Pasant
+// - En Pasant
 // - King/Rook: Castling
 // - Check / Checkmate
 
 export class ChessGame {
 
     board: string[][]
-    canMove: boolean[][]
+    // canMove: boolean[][]
+    canMove: string[][]
     selectedPiece: number[]|undefined[]
 
-    constructor () {
+    constructor (chessboard?:string[][]) {
 
-      this.board = [
+      this.board = chessboard || [
         ["bR","bN","bB","bQ","bK","bB","bN","bR",],
         ["bP","bP","bP","bP","bP","bP","bP","bP",],
         ["","","","","","","","",],
@@ -22,15 +23,25 @@ export class ChessGame {
         ["wR","wN","wB","wQ","wK","wB","wN","wR",],
       ]
 
+      // this.canMove = [
+      //   [false,false,false,false,false,false,false,false,],
+      //   [false,false,false,false,false,false,false,false,],
+      //   [false,false,false,false,false,false,false,false,],
+      //   [false,false,false,false,false,false,false,false,],
+      //   [false,false,false,false,false,false,false,false,],
+      //   [false,false,false,false,false,false,false,false,],
+      //   [false,false,false,false,false,false,false,false,],
+      //   [false,false,false,false,false,false,false,false,],
+      // ]
       this.canMove = [
-        [false,false,false,false,false,false,false,false,],
-        [false,false,false,false,false,false,false,false,],
-        [false,false,false,false,false,false,false,false,],
-        [false,false,false,false,false,false,false,false,],
-        [false,false,false,false,false,false,false,false,],
-        [false,false,false,false,false,false,false,false,],
-        [false,false,false,false,false,false,false,false,],
-        [false,false,false,false,false,false,false,false,],
+        ["","","","","","","","",],
+        ["","","","","","","","",],
+        ["","","","","","","","",],
+        ["","","","","","","","",],
+        ["","","","","","","","",],
+        ["","","","","","","","",],
+        ["","","","","","","","",],
+        ["","","","","","","","",],
       ]
 
       this.selectedPiece = [undefined,undefined]
@@ -44,16 +55,26 @@ export class ChessGame {
         this.selectedPiece = [rowIndex,colIndex]
         
         // Reset canMove array
+        // this.canMove = [
+        //   [false,false,false,false,false,false,false,false,],
+        //   [false,false,false,false,false,false,false,false,],
+        //   [false,false,false,false,false,false,false,false,],
+        //   [false,false,false,false,false,false,false,false,],
+        //   [false,false,false,false,false,false,false,false,],
+        //   [false,false,false,false,false,false,false,false,],
+        //   [false,false,false,false,false,false,false,false,],
+        //   [false,false,false,false,false,false,false,false,],
+        // ]
         this.canMove = [
-          [false,false,false,false,false,false,false,false,],
-          [false,false,false,false,false,false,false,false,],
-          [false,false,false,false,false,false,false,false,],
-          [false,false,false,false,false,false,false,false,],
-          [false,false,false,false,false,false,false,false,],
-          [false,false,false,false,false,false,false,false,],
-          [false,false,false,false,false,false,false,false,],
-          [false,false,false,false,false,false,false,false,],
-        ]
+        ["","","","","","","","",],
+        ["","","","","","","","",],
+        ["","","","","","","","",],
+        ["","","","","","","","",],
+        ["","","","","","","","",],
+        ["","","","","","","","",],
+        ["","","","","","","","",],
+        ["","","","","","","","",],
+      ]
 
         const enemyPiece = currentPlayer === "w" ? "b" : "w"
         const piece = this.board[rowIndex][colIndex]
@@ -69,47 +90,54 @@ export class ChessGame {
 
           // Can move forward if nothing in front
           if (this.board[rowIndex+pawnMovement[0]][colIndex] === ""){
-            this.canMove[rowIndex+pawnMovement[0]][colIndex] = true
+            // this.canMove[rowIndex+pawnMovement[0]][colIndex] = true
+            this.canMove[rowIndex+pawnMovement[0]][colIndex] = "move"
           }
-          if (colIndex - 1 > 0 && colIndex + 1 < 7) {
 
-            // Can move diagonal up-right if piece there
+          // If not at the left side of the board
+          if (colIndex !== 0) {
+            // Can move diagonal diagonal-right if enemy piece there
             if (this.board[rowIndex+pawnMovement[0]][colIndex-1].includes(enemyPiece)){
-              this.canMove[rowIndex+pawnMovement[0]][colIndex-1] = true
+              // this.canMove[rowIndex+pawnMovement[0]][colIndex-1] = true
+              this.canMove[rowIndex+pawnMovement[0]][colIndex-1] = "move"
             }
-            // Can move diagonal up-left if piece there
+          }
+          // If not at the right side of the board
+          if (colIndex !== 7) {
+            // Can move diagonal diagonal-left if enemy piece there
             if (this.board[rowIndex+pawnMovement[0]][colIndex+1].includes(enemyPiece)){
-              this.canMove[rowIndex+pawnMovement[0]][colIndex+1] = true
+              // this.canMove[rowIndex+pawnMovement[0]][colIndex+1] = true
+              this.canMove[rowIndex+pawnMovement[0]][colIndex+1] = "move"
             }
           }
           // Can move two forward if starting position
           if ((currentPlayer === "w" && rowIndex === 6) || (currentPlayer === "b" && rowIndex === 1)) {
 
             if (this.board[rowIndex+pawnMovement[0]][colIndex] === "" && this.board[rowIndex+pawnMovement[1]][colIndex] === "") {
-              this.canMove[rowIndex+pawnMovement[1]][colIndex] = true
+              // this.canMove[rowIndex+pawnMovement[1]][colIndex] = true
+              this.canMove[rowIndex+pawnMovement[1]][colIndex] = "move"
             }
           }
           // En Pasant  
-
-          // Promotion
         }
         
         if (piece.includes("N")) {
 
-          const KnightMoves = [
+          const knightMoves = [
             [2,1],[2,-1],[-2,1],[-2,-1],[1,2],[1,-2],[-1,2],[-1,-2],
           ]
 
-          for (let i=0; i<KnightMoves.length;i++){
+          for (let i=0; i<knightMoves.length;i++){
 
-            if ( rowIndex+KnightMoves[i][0] >= 0 && 
-                 rowIndex+KnightMoves[i][0] <= 7 &&
-                 colIndex+KnightMoves[i][1] >= 0 &&
-                 colIndex+KnightMoves[i][1] <= 7 ) {
+            if ( rowIndex+knightMoves[i][0] >= 0 && 
+                 rowIndex+knightMoves[i][0] <= 7 &&
+                 colIndex+knightMoves[i][1] >= 0 &&
+                 colIndex+knightMoves[i][1] <= 7 ) {
 
-              if (this.board[rowIndex+KnightMoves[i][0]][colIndex+KnightMoves[i][1]].includes(enemyPiece) || 
-                  this.board[rowIndex+KnightMoves[i][0]][colIndex+KnightMoves[i][1]] === "") {
-                this.canMove[rowIndex+KnightMoves[i][0]][colIndex+KnightMoves[i][1]] = true
+              if (this.board[rowIndex+knightMoves[i][0]][colIndex+knightMoves[i][1]].includes(enemyPiece) || 
+                  this.board[rowIndex+knightMoves[i][0]][colIndex+knightMoves[i][1]] === "") {
+                // this.canMove[rowIndex+knightMoves[i][0]][colIndex+knightMoves[i][1]] = true
+                this.canMove[rowIndex+knightMoves[i][0]][colIndex+knightMoves[i][1]] = "move"
               }
             }
 
@@ -146,9 +174,11 @@ export class ChessGame {
                 colIndex+pieceMoves[i][1]*j <= 7 ) {
 
                   if (this.board[rowIndex+pieceMoves[i][0]*j][colIndex+pieceMoves[i][1]*j] === "") {
-                    this.canMove[rowIndex+pieceMoves[i][0]*j][colIndex+pieceMoves[i][1]*j] = true
+                    // this.canMove[rowIndex+pieceMoves[i][0]*j][colIndex+pieceMoves[i][1]*j] = true
+                    this.canMove[rowIndex+pieceMoves[i][0]*j][colIndex+pieceMoves[i][1]*j] = "move"
                   } else if (this.board[rowIndex+pieceMoves[i][0]*j][colIndex+pieceMoves[i][1]*j].includes(enemyPiece)) {
-                    this.canMove[rowIndex+pieceMoves[i][0]*j][colIndex+pieceMoves[i][1]*j] = true
+                    // this.canMove[rowIndex+pieceMoves[i][0]*j][colIndex+pieceMoves[i][1]*j] = true
+                    this.canMove[rowIndex+pieceMoves[i][0]*j][colIndex+pieceMoves[i][1]*j] = "move"
                     break
                   } else {
                     break
@@ -167,49 +197,56 @@ export class ChessGame {
             [1,0],[-1,0],[0,1],[0,-1]
           ]
 
-
-
           for (let i=0; i<kingMoves.length;i++) {
 
-              if ( rowIndex+kingMoves[i][0] >= 0 && 
-                rowIndex+kingMoves[i][0] <= 7 &&
-                colIndex+kingMoves[i][1] >= 0 &&
-                colIndex+kingMoves[i][1] <= 7 ) {
+            const row = rowIndex+kingMoves[i][0]
+            const col = colIndex+kingMoves[i][1]
 
-                  if (this.board[rowIndex+kingMoves[i][0]][colIndex+kingMoves[i][1]] === "") {
-                    this.canMove[rowIndex+kingMoves[i][0]][colIndex+kingMoves[i][1]] = true
-                  } else if (this.board[rowIndex+kingMoves[i][0]][colIndex+kingMoves[i][1]].includes(enemyPiece)) {
-                    this.canMove[rowIndex+kingMoves[i][0]][colIndex+kingMoves[i][1]] = true
-                  } 
-                
+            if ( row >= 0 && row <= 7 && col >= 0 && col <= 7 ) {
+
+              // Go to empty field or take enemy piece
+              if (this.board[row][col] === "" || this.board[row][col].includes(enemyPiece)) {
+                // this.canMove[row][col] = true
+                this.canMove[row][col] = "move"
+              }  
+              
+              // Long castling
+              if (this.board[7][4] === "wK" && this.board[7][0] === "wR" && this.board[7][1] === "" && this.board[7][2] === "" && this.board[7][3] === "") {
+                // this.canMove[7][1] = true
+                this.canMove[7][1] = "castling"
               }
 
+              // short castling
+              if (this.board[7][4] === "wK" && this.board[7][7] === "wR" && this.board[7][5] === "" && this.board[7][6] === "") {
+                // this.canMove[7][6] = true
+                this.canMove[7][6] = "castling"
+              }
+            }
           }
         }
-
         return true
       }
-      
       return false
-      
-
     }
 
     movePiece(rowIndex:number, colIndex:number, currentPlayer:string, promotion?:boolean, promotedPiece?:string) {
 
-      if (this.canMove[rowIndex][colIndex] === true) {
+      if (this.canMove[rowIndex][colIndex] === "move") {
 
         if (!promotion) {
 
-            if ((rowIndex === 0 && currentPlayer === "w") || (rowIndex === 7 && currentPlayer === "b")){
-                
-                if(currentPlayer === "w") {
-                    return ["promotion","w"]
-                } else {
-                    return ["promotion","b"]
-                }
-                
+          if (this.selectedPiece[0] !== undefined && this.selectedPiece[1] !== undefined) {
+
+            if (((rowIndex === 0 && currentPlayer === "w") || (rowIndex === 7 && currentPlayer === "b")) && this.board[this.selectedPiece[0]][this.selectedPiece[1]].includes("P")){
+              
+              if(currentPlayer === "w") {
+                return ["promotion","w"]
+              } else {
+                return ["promotion","b"]
+              }
+              
             }
+          }
         }
 
         if (this.selectedPiece[0] !== undefined && this.selectedPiece[1] !== undefined) {
@@ -218,26 +255,75 @@ export class ChessGame {
           this.board[this.selectedPiece[0]][this.selectedPiece[1]] = ""
           this.board[rowIndex][colIndex] = piece
           this.selectedPiece = [undefined,undefined]
+          // this.canMove = [
+          //   [false,false,false,false,false,false,false,false,],
+          //   [false,false,false,false,false,false,false,false,],
+          //   [false,false,false,false,false,false,false,false,],
+          //   [false,false,false,false,false,false,false,false,],
+          //   [false,false,false,false,false,false,false,false,],
+          //   [false,false,false,false,false,false,false,false,],
+          //   [false,false,false,false,false,false,false,false,],
+          //   [false,false,false,false,false,false,false,false,],
+          // ]
           this.canMove = [
-            [false,false,false,false,false,false,false,false,],
-            [false,false,false,false,false,false,false,false,],
-            [false,false,false,false,false,false,false,false,],
-            [false,false,false,false,false,false,false,false,],
-            [false,false,false,false,false,false,false,false,],
-            [false,false,false,false,false,false,false,false,],
-            [false,false,false,false,false,false,false,false,],
-            [false,false,false,false,false,false,false,false,],
+            ["","","","","","","","",],
+            ["","","","","","","","",],
+            ["","","","","","","","",],
+            ["","","","","","","","",],
+            ["","","","","","","","",],
+            ["","","","","","","","",],
+            ["","","","","","","","",],
+            ["","","","","","","","",],
           ]
           return ["success"]
         }
         return ["failed"]
-      } else {
-        return ["failed"]
+      } 
+
+      if (this.canMove[rowIndex][colIndex] === "castling") {
+
+        if(rowIndex === 7 && colIndex === 6){
+          this.board[rowIndex][colIndex] = "wK"
+          this.board[7][5] = "wR"
+          this.board[7][7] = ""
+          this.board[7][4] = ""
+          this.selectedPiece = [undefined,undefined]
+          this.canMove = [
+            ["","","","","","","","",],
+            ["","","","","","","","",],
+            ["","","","","","","","",],
+            ["","","","","","","","",],
+            ["","","","","","","","",],
+            ["","","","","","","","",],
+            ["","","","","","","","",],
+            ["","","","","","","","",],
+          ]
+          return ["success"]
+        }
+
+        if(rowIndex === 7 && colIndex === 1){
+          this.board[rowIndex][colIndex] = "wK"
+          this.board[7][2] = "wR"
+          this.board[7][0] = ""
+          this.board[7][4] = ""
+          this.selectedPiece = [undefined,undefined]
+          this.canMove = [
+            ["","","","","","","","",],
+            ["","","","","","","","",],
+            ["","","","","","","","",],
+            ["","","","","","","","",],
+            ["","","","","","","","",],
+            ["","","","","","","","",],
+            ["","","","","","","","",],
+            ["","","","","","","","",],
+          ]
+          return ["success"]
+        }
+
       }
+
+      return ["failed"]
+      
     }
-
-    // promotePiece(rowIndex:number, colIndex:number, currentPlayer:string) {
-
-    // }
 
   }
