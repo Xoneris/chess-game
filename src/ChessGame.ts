@@ -1,14 +1,15 @@
 // ToDo:
-// - En Pasant
-// - King/Rook: Castling
+// --------
+// - Castling: Make sure you can only do it once
 // - Check / Checkmate
+// --------
 
 export class ChessGame {
 
     board: string[][]
-    // canMove: boolean[][]
     canMove: string[][]
     selectedPiece: number[]|undefined[]
+    lastMove: [string,number|undefined,number|undefined,number|undefined,number|undefined]
 
     constructor (chessboard?:string[][]) {
 
@@ -23,16 +24,6 @@ export class ChessGame {
         ["wR","wN","wB","wQ","wK","wB","wN","wR",],
       ]
 
-      // this.canMove = [
-      //   [false,false,false,false,false,false,false,false,],
-      //   [false,false,false,false,false,false,false,false,],
-      //   [false,false,false,false,false,false,false,false,],
-      //   [false,false,false,false,false,false,false,false,],
-      //   [false,false,false,false,false,false,false,false,],
-      //   [false,false,false,false,false,false,false,false,],
-      //   [false,false,false,false,false,false,false,false,],
-      //   [false,false,false,false,false,false,false,false,],
-      // ]
       this.canMove = [
         ["","","","","","","","",],
         ["","","","","","","","",],
@@ -45,36 +36,28 @@ export class ChessGame {
       ]
 
       this.selectedPiece = [undefined,undefined]
+      this.lastMove = ["",undefined,undefined,undefined,undefined]
     }
     
     selectPiece(rowIndex:number, colIndex:number, currentPlayer:string) {
 
+      // If you click on a piece of the current player
       if (this.board[rowIndex][colIndex].includes(currentPlayer)) {
 
         // store coordinates of selected piece
         this.selectedPiece = [rowIndex,colIndex]
         
         // Reset canMove array
-        // this.canMove = [
-        //   [false,false,false,false,false,false,false,false,],
-        //   [false,false,false,false,false,false,false,false,],
-        //   [false,false,false,false,false,false,false,false,],
-        //   [false,false,false,false,false,false,false,false,],
-        //   [false,false,false,false,false,false,false,false,],
-        //   [false,false,false,false,false,false,false,false,],
-        //   [false,false,false,false,false,false,false,false,],
-        //   [false,false,false,false,false,false,false,false,],
-        // ]
         this.canMove = [
-        ["","","","","","","","",],
-        ["","","","","","","","",],
-        ["","","","","","","","",],
-        ["","","","","","","","",],
-        ["","","","","","","","",],
-        ["","","","","","","","",],
-        ["","","","","","","","",],
-        ["","","","","","","","",],
-      ]
+          ["","","","","","","","",],
+          ["","","","","","","","",],
+          ["","","","","","","","",],
+          ["","","","","","","","",],
+          ["","","","","","","","",],
+          ["","","","","","","","",],
+          ["","","","","","","","",],
+          ["","","","","","","","",],
+        ]
 
         const enemyPiece = currentPlayer === "w" ? "b" : "w"
         const piece = this.board[rowIndex][colIndex]
@@ -119,6 +102,34 @@ export class ChessGame {
             }
           }
           // En Pasant  
+          if (
+              currentPlayer === "w" && // currentPlayer is white
+              rowIndex === 3 && // white Pawn is on the 5 rank
+              this.lastMove[0] === "bP" && // last moved enemy piece is a Pawn
+              this.lastMove[1] === 1 // enemy piece moved from 7 rank
+            ) {
+
+            if(this.lastMove[2] === colIndex+1){
+              this.canMove[rowIndex+pawnMovement[0]][colIndex+1] = "en passant"
+            }
+            if(this.lastMove[2] === colIndex-1){
+              this.canMove[rowIndex+pawnMovement[0]][colIndex-1] = "en passant"
+            }
+          }
+          if (
+              currentPlayer === "b" && // currentPlayer is black
+              rowIndex === 4 && // black Pawn is on the 3 rank
+              this.lastMove[0] === "wP" && // last moved enemy piece is a Pawn
+              this.lastMove[1] === 6 // enemy piece moved from 7 rank
+            ) {
+
+            if(this.lastMove[2] === colIndex+1){
+              this.canMove[rowIndex+pawnMovement[0]][colIndex+1] = "en passant"
+            }
+            if(this.lastMove[2] === colIndex-1){
+              this.canMove[rowIndex+pawnMovement[0]][colIndex-1] = "en passant"
+            }
+          }
         }
         
         if (piece.includes("N")) {
@@ -208,7 +219,6 @@ export class ChessGame {
 
               // Go to empty field or take enemy piece
               if (this.board[row][col] === "" || this.board[row][col].includes(enemyPiece)) {
-                // this.canMove[row][col] = true
                 this.canMove[row][col] = "move"
               }  
               
@@ -251,20 +261,12 @@ export class ChessGame {
 
         if (this.selectedPiece[0] !== undefined && this.selectedPiece[1] !== undefined) {
           
+          this.lastMove = [this.board[this.selectedPiece[0]][this.selectedPiece[1]],this.selectedPiece[0],this.selectedPiece[1],rowIndex,colIndex]
+
           const piece = promotedPiece || this.board[this.selectedPiece[0]][this.selectedPiece[1]]
           this.board[this.selectedPiece[0]][this.selectedPiece[1]] = ""
           this.board[rowIndex][colIndex] = piece
           this.selectedPiece = [undefined,undefined]
-          // this.canMove = [
-          //   [false,false,false,false,false,false,false,false,],
-          //   [false,false,false,false,false,false,false,false,],
-          //   [false,false,false,false,false,false,false,false,],
-          //   [false,false,false,false,false,false,false,false,],
-          //   [false,false,false,false,false,false,false,false,],
-          //   [false,false,false,false,false,false,false,false,],
-          //   [false,false,false,false,false,false,false,false,],
-          //   [false,false,false,false,false,false,false,false,],
-          // ]
           this.canMove = [
             ["","","","","","","","",],
             ["","","","","","","","",],
@@ -321,7 +323,30 @@ export class ChessGame {
           ]
           return ["success"]
         }
+      }
 
+      if (this.canMove[rowIndex][colIndex] === "en passant") {
+        
+        if (this.selectedPiece[0] !== undefined && this.selectedPiece[1] !== undefined) {
+
+          const derp = currentPlayer === "w" ? 1 : -1
+
+          this.board[this.selectedPiece[0]][this.selectedPiece[1]] = ""
+          this.board[rowIndex+derp][colIndex] = ""
+          this.board[rowIndex][colIndex] = currentPlayer+"P"
+          this.selectedPiece = [undefined,undefined]
+          this.canMove = [
+            ["","","","","","","","",],
+            ["","","","","","","","",],
+            ["","","","","","","","",],
+            ["","","","","","","","",],
+            ["","","","","","","","",],
+            ["","","","","","","","",],
+            ["","","","","","","","",],
+            ["","","","","","","","",],
+          ]
+          return ["success"]
+        }
       }
 
       return ["failed"]

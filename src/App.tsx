@@ -112,70 +112,129 @@ export default function App() {
     setPromotion(["",0,0])
   }
 
+  const convertToChessFieldNotation = (rowIndex:number|undefined, colIndex:number|undefined) => {
+
+    if (rowIndex !== undefined && colIndex !== undefined){
+      
+      let row = ""
+      switch(rowIndex) {
+        case 7:
+          row = "A"
+          break
+        case 6:
+          row = "B"
+          break
+        case 5:
+          row = "C"
+          break
+        case 4:
+          row = "D"
+          break
+        case 3:
+          row = "E"
+          break
+        case 2:
+          row = "F"
+          break
+        case 1:
+          row = "G"
+          break
+        case 0:
+          row = "H"
+          break
+      }
+
+      const col = colIndex + 1
+
+      return row + col
+    }
+  }
+
   return (
     <main className="w-screen h-screen flex flex-col justify-center items-center bg-gray-400">
 
-      <button className="bg-white p-2 border mb-2 rounded-lg hover:cursor-pointer" onClick={() => newGame()}>
-        New Game
-      </button>
-      {
-        chessGame.current.board.map((row,rowIndex) => (
-          <div className="flex" key={rowIndex} >
-          {
-            row.map((field,colIndex) => (
-            
-              <div
-                key={colIndex} 
-                className={
-                  `w-16 h-16 border flex justify-center items-center 
-                  ${chessGame.current.selectedPiece[0] === rowIndex && chessGame.current.selectedPiece[1] === colIndex ? "bg-yellow-600" : null}
-                  ${chessGame.current.canMove[rowIndex][colIndex] === "move" || chessGame.current.canMove[rowIndex][colIndex] === "castling"
-                    ? chessGame.current.board[rowIndex][colIndex].includes(currentPlayer === "w" ? "b" : "w")
-                      ? "bg-red-600"
-                      : "bg-green-600"
-                    : (rowIndex + colIndex) % 2 !== 0
-                      ? "bg-gray-700"
-                      : "bg-white"
-                  }
-                `}
-                onClick={() => handleClick(rowIndex, colIndex)}
-                onMouseOver={() => setHoverField([rowIndex, colIndex, chessGame.current.board[rowIndex][colIndex]])}
-              >
-                {
-                  field !== ""
-                  ? <img 
-                    src={`/chess-figures/${chessFigure(field)}.svg`}
-                  />
-                  : null
-                }
-                
+      <nav className="bg-blue-950 w-full p-2 text-gray-300">
+        votechess
+      </nav>
 
-              </div>
-            ))
-          }
-          </div>
-        ))
-      }
-      {
-        promotion[0] !== ""
-        ?<div className="flex gap-2 p-2">
-          <p onClick={() => handlePromotion(promotion,"Q")}>{currentPlayer}Q</p>
-          <p onClick={() => handlePromotion(promotion,"R")}>{currentPlayer}R</p>
-          <p onClick={() => handlePromotion(promotion,"N")}>{currentPlayer}N</p>
-          <p onClick={() => handlePromotion(promotion,"B")}>{currentPlayer}B</p>
-        </div>
-        : null
-      }
+      <div className="w-full grow p-4">
       
-      <div>
-        <p>rowIndex: {hoverField[0]}</p>
-        <p>colIndex: {hoverField[1]}</p>
-        <p>Piece: {hoverField[2]}</p>
-      </div>
+        <button className="bg-white p-2 border mb-2 rounded-lg hover:cursor-pointer" onClick={() => newGame()}>
+          New Game
+        </button>
 
-      <p>
-        Current Player: {currentPlayer}
-      </p>
+        {
+          chessGame.current.board.map((row,rowIndex) => (
+            <div className="flex" key={rowIndex} >
+            {
+              row.map((field,colIndex) => (
+              
+                <div
+                  key={colIndex} 
+                  className={
+                    `w-16 h-16 border flex justify-center items-center 
+                    ${chessGame.current.selectedPiece[0] === rowIndex && chessGame.current.selectedPiece[1] === colIndex ? "bg-yellow-600" : null}
+                    ${chessGame.current.canMove[rowIndex][colIndex] === "move" || chessGame.current.canMove[rowIndex][colIndex] === "castling" || chessGame.current.canMove[rowIndex][colIndex] === "en passant"
+                      ? chessGame.current.board[rowIndex][colIndex].includes(currentPlayer === "w" ? "b" : "w")
+                        ? "bg-red-600"
+                        : "bg-green-600"
+                      : (rowIndex + colIndex) % 2 !== 0
+                        ? "bg-gray-700"
+                        : "bg-white"
+                    }
+                  `}
+                  onClick={() => handleClick(rowIndex, colIndex)}
+                  onMouseOver={() => setHoverField([rowIndex, colIndex, chessGame.current.board[rowIndex][colIndex]])}
+                >
+                  {
+                    field !== ""
+                    ? <img 
+                      src={`/chess-figures/${chessFigure(field)}.svg`}
+                    />
+                    : null
+                  }
+                  
+
+                </div>
+              ))
+            }
+            </div>
+          ))
+        }
+        {
+          promotion[0] !== ""
+          ?<div className="flex gap-2 p-2">
+            <p onClick={() => handlePromotion(promotion,"Q")}>{currentPlayer}Q</p>
+            <p onClick={() => handlePromotion(promotion,"R")}>{currentPlayer}R</p>
+            <p onClick={() => handlePromotion(promotion,"N")}>{currentPlayer}N</p>
+            <p onClick={() => handlePromotion(promotion,"B")}>{currentPlayer}B</p>
+          </div>
+          : null
+        }
+        
+        <div>
+          <p>rowIndex: {hoverField[0]}</p>
+          <p>colIndex: {hoverField[1]}</p>
+          <p>Piece: {hoverField[2]}</p>
+        </div>
+
+        <div className="flex flex-col">
+          <h4>Last Move: </h4>
+          <p>Piece: {chessGame.current.lastMove[0]}</p>
+          <p>From: {convertToChessFieldNotation(chessGame.current.lastMove[1],chessGame.current.lastMove[2])}</p>
+          <p>To: {convertToChessFieldNotation(chessGame.current.lastMove[3],chessGame.current.lastMove[4])}</p>
+        </div>
+
+        <p>
+          Current Player: {currentPlayer}
+        </p>
+
+      </div>
+      <footer className="w-full p-2 bg-blue-900 flex justify-center items-center">
+        made by me
+      </footer>
+
+
     </main>
   )
 }
