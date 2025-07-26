@@ -154,10 +154,10 @@ export default function App() {
     <main className="w-screen h-screen flex flex-col justify-center items-center bg-gray-400">
 
       <nav className="bg-blue-950 w-full p-2 text-gray-300">
-        votechess
+        
       </nav>
 
-      <div className="w-full grow p-4">
+      <div className="w-full grow p-4 flex flex-col justify-center items-center">
       
         <button className="bg-white p-2 border mb-2 rounded-lg hover:cursor-pointer" onClick={() => newGame()}>
           New Game
@@ -172,7 +172,7 @@ export default function App() {
                 <div
                   key={colIndex} 
                   className={
-                    `w-16 h-16 border flex justify-center items-center 
+                    `w-16 h-16 border flex justify-center items-center transition-all
                     ${chessGame.current.selectedPiece[0] === rowIndex && chessGame.current.selectedPiece[1] === colIndex ? "bg-yellow-600" : null}
                     ${chessGame.current.canMove[rowIndex][colIndex] === "move" || chessGame.current.canMove[rowIndex][colIndex] === "castling" || chessGame.current.canMove[rowIndex][colIndex] === "en passant"
                       ? chessGame.current.board[rowIndex][colIndex].includes(currentPlayer === "w" ? "b" : "w")
@@ -190,6 +190,7 @@ export default function App() {
                     field !== ""
                     ? <img 
                       src={`/chess-figures/${chessFigure(field)}.svg`}
+                      alt={chessFigure(field)}
                     />
                     : null
                   }
@@ -229,9 +230,23 @@ export default function App() {
           Current Player: {currentPlayer}
         </p>
 
+        <p>
+          White has castled: {chessGame.current.whiteHasCastled === true ? "yes" : "no"}
+        </p>
+        <p>
+          Black has castled: {chessGame.current.blackHasCastled === true ? "yes" : "no"}
+        </p>
+        <p>
+          White King has moved: {chessGame.current.whiteKingHasMoved === true ? "yes" : "no"}
+        </p>
+        <p>
+          Black King has moved: {chessGame.current.blackKingHasMoved === true ? "yes" : "no"}
+        </p>
+
       </div>
+
       <footer className="w-full p-2 bg-blue-900 flex justify-center items-center">
-        made by me
+        
       </footer>
 
 

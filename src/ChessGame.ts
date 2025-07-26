@@ -1,6 +1,5 @@
 // ToDo:
 // --------
-// - Castling: Make sure you can only do it once
 // - Check / Checkmate
 // --------
 
@@ -11,7 +10,12 @@ export class ChessGame {
     selectedPiece: number[]|undefined[]
     lastMove: [string,number|undefined,number|undefined,number|undefined,number|undefined]
 
-    constructor (chessboard?:string[][]) {
+    whiteKingHasMoved: boolean
+    blackKingHasMoved: boolean
+    whiteHasCastled: boolean
+    blackHasCastled: boolean
+
+    constructor (chessboard?:string[][], whiteKingHasCastled?:boolean, blackKingHasCastled?:boolean, whiteHasCastled?:boolean, blackHasCastled?: boolean) {
 
       this.board = chessboard || [
         ["bR","bN","bB","bQ","bK","bB","bN","bR",],
@@ -37,6 +41,11 @@ export class ChessGame {
 
       this.selectedPiece = [undefined,undefined]
       this.lastMove = ["",undefined,undefined,undefined,undefined]
+
+      this.whiteKingHasMoved = whiteKingHasCastled || false
+      this.blackKingHasMoved = blackKingHasCastled || false
+      this.whiteHasCastled = whiteHasCastled || false
+      this.blackHasCastled = blackHasCastled || false
     }
     
     selectPiece(rowIndex:number, colIndex:number, currentPlayer:string) {
@@ -222,14 +231,19 @@ export class ChessGame {
                 this.canMove[row][col] = "move"
               }  
               
-              // Long castling
-              if (this.board[ummm][4] === currentPlayer+"K" && this.board[ummm][0] === currentPlayer+"R" && this.board[ummm][1] === "" && this.board[ummm][2] === "" && this.board[ummm][3] === "") {
-                this.canMove[ummm][1] = "castling"
-              }
+              // Castling
+              if ((currentPlayer === "w" && this.whiteHasCastled !== true && this.whiteKingHasMoved !== true) || (currentPlayer === "b" && this.blackHasCastled !== true && this.blackKingHasMoved !== true)) {
+                
+                // Long castling
+                if (this.board[ummm][4] === currentPlayer+"K" && this.board[ummm][0] === currentPlayer+"R" && this.board[ummm][1] === "" && this.board[ummm][2] === "" && this.board[ummm][3] === "") {
+                  this.canMove[ummm][1] = "castling"
+                }
 
-              // short castling
-              if (this.board[ummm][4] === currentPlayer+"K" && this.board[ummm][7] === currentPlayer+"R" && this.board[ummm][5] === "" && this.board[ummm][6] === "") {
-                this.canMove[ummm][6] = "castling"
+                // short castling
+                if (this.board[ummm][4] === currentPlayer+"K" && this.board[ummm][7] === currentPlayer+"R" && this.board[ummm][5] === "" && this.board[ummm][6] === "") {
+                  this.canMove[ummm][6] = "castling"
+                }
+
               }
             }
           }
@@ -264,6 +278,13 @@ export class ChessGame {
           this.lastMove = [this.board[this.selectedPiece[0]][this.selectedPiece[1]],this.selectedPiece[0],this.selectedPiece[1],rowIndex,colIndex]
 
           const piece = promotedPiece || this.board[this.selectedPiece[0]][this.selectedPiece[1]]
+
+          if (piece.includes("K") && currentPlayer === "w"){
+            this.whiteKingHasMoved = true
+          } else if (piece.includes("K") && currentPlayer === "b") {
+            this.blackKingHasMoved = true
+          }
+
           this.board[this.selectedPiece[0]][this.selectedPiece[1]] = ""
           this.board[rowIndex][colIndex] = piece
           this.selectedPiece = [undefined,undefined]
@@ -284,13 +305,20 @@ export class ChessGame {
 
       if (this.canMove[rowIndex][colIndex] === "castling") {
 
-        const ummm = currentPlayer === "w" ? 7 : 0
+        const backlineOfCurrentPlayerKing = currentPlayer === "w" ? 7 : 0
 
-        if(rowIndex === ummm && colIndex === 6){
+        if((rowIndex === backlineOfCurrentPlayerKing && colIndex === 6) || (rowIndex === backlineOfCurrentPlayerKing && colIndex === 1)){
           this.board[rowIndex][colIndex] = currentPlayer+"K"
-          this.board[ummm][5] = currentPlayer+"R"
-          this.board[ummm][7] = ""
-          this.board[ummm][4] = ""
+          if (colIndex === 6) {
+            this.board[backlineOfCurrentPlayerKing][5] = currentPlayer+"R"
+            this.board[backlineOfCurrentPlayerKing][7] = ""
+            this.board[backlineOfCurrentPlayerKing][4] = ""
+          } else if (colIndex === 1) {
+            this.board[backlineOfCurrentPlayerKing][2] = currentPlayer+"R"
+            this.board[backlineOfCurrentPlayerKing][0] = ""
+            this.board[backlineOfCurrentPlayerKing][4] = ""
+          }
+          
           this.selectedPiece = [undefined,undefined]
           this.canMove = [
             ["","","","","","","","",],
@@ -302,27 +330,18 @@ export class ChessGame {
             ["","","","","","","","",],
             ["","","","","","","","",],
           ]
+          if (currentPlayer === "w") {
+            this.whiteHasCastled = true
+            this.whiteKingHasMoved = true
+          }
+          if (currentPlayer === "b") {
+            this.blackHasCastled = true
+            this.blackKingHasMoved = true
+          }
+          
           return ["success"]
         }
 
-        if(rowIndex === ummm && colIndex === 1){
-          this.board[rowIndex][colIndex] = "wK"
-          this.board[ummm][2] = "wR"
-          this.board[ummm][0] = ""
-          this.board[ummm][4] = ""
-          this.selectedPiece = [undefined,undefined]
-          this.canMove = [
-            ["","","","","","","","",],
-            ["","","","","","","","",],
-            ["","","","","","","","",],
-            ["","","","","","","","",],
-            ["","","","","","","","",],
-            ["","","","","","","","",],
-            ["","","","","","","","",],
-            ["","","","","","","","",],
-          ]
-          return ["success"]
-        }
       }
 
       if (this.canMove[rowIndex][colIndex] === "en passant") {
@@ -348,9 +367,6 @@ export class ChessGame {
           return ["success"]
         }
       }
-
       return ["failed"]
-      
     }
-
   }
